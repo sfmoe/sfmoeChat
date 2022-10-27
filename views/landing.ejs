@@ -1,0 +1,14 @@
+<%- include('./partials/header'); %>
+
+<div id="landing">
+<h1>SFMoe Chat</h1>
+<button id="startButton" onClick="window.location.href='/chat'">Start Chat</button>
+
+<form action="/chat" method="get" name="joinChat">
+    <input type="text" id="chatRoomID" value="">
+    <button>Join Chat</button>
+</form>
+
+</div>
+
+<%- include('./partials/footer'); %>

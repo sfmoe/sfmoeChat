@@ -1,0 +1,47 @@
+:root{
+    --darkblue: darkslateblue;
+    --darkgrey: #333;
+}
+
+body{
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    flex-wrap:nowrap;
+    min-height: 100vh;
+}
+
+#chatRoom{
+    background-color:var(--darkblue);
+    width: 100%;
+    flex-grow: 1;
+    display: flex;
+    flex-wrap: nowrap;
+}
+
+#chatRoom > div{
+    flex-grow: 1;
+}
+
+#chatRoom .chatContainer{
+    max-width: 20%;
+    background: var(--darkgrey);
+    color: #fff;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+}
+
+.chatContainer .chatMessages {
+    flex-grow: 1;
+}
+.chatContainer .chatMessageInput {
+    flex-grow: 0;
+} 
+#chatRoom .videoContainer{
+    padding: 20px;
+}
+#chatRoom video{ 
+    width: 100px;
+}

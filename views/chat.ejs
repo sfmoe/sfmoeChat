@@ -1,0 +1,22 @@
+<%- include('./partials/header'); %>
+<script>
+    ROOM_ID = "<%=chatID%>";
+</script>
+
+
+<!--
+    - landing page with join / create room buttons / form.
+    -to create a random number when a user joins
+    -each user that joins shows as bubble video
+    -TRY to host it on glitch.com
+-->
+<div id="chatRoom">
+    
+    <div class="videoContainer"></div>
+    <div class="chatContainer">
+        <div class="chatMessages"></div>
+        <input class="chatMessageInput">
+    </div>
+</div>
+
+<%- include('./partials/footer'); %>
