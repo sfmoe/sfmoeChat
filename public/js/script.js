@@ -16,11 +16,34 @@ if(form){
 //using https://medium.com/codesphere-cloud/building-a-video-chat-app-with-socket-io-peerjs-codesphere-b0663bcbe3d7
 /* chat room */
 const videoContainer = document.querySelector(".videoContainer");
+
+const createVideoEl = (muted)=>{
+        const video = document.createElement("video");
+        const cameraContainer = document.createElement("div");
+        cameraContainer.classList.add("cameraContainer");
+        cameraContainer.appendChild(video);
+        if(muted){
+            video.muted=true;
+        }
+        return cameraContainer;
+};
+
+const addVideoStream = (video, stream)=>{
+    videoEl = video.querySelector("video")
+    videoEl.srcObject = stream;
+    videoEl.addEventListener("loadedmetadata", ()=>{
+        videoEl.play();
+    })
+    
+    videoContainer.append(video);
+    
+};
+
+
 if(videoContainer){
 
-    const myCamera = document.createElement("video");
-    myCamera.muted = true;
-    
+    const myCameraContainer = createVideoEl(true);
+
     /* socket stuff for chat */
     
 
@@ -30,30 +53,23 @@ if(videoContainer){
         const socket = io("/");
         let peer = new Peer();
         
-        const addVideoStream = (video, stream)=>{
-            
-            video.srcObject = stream;
-            video.addEventListener("loadedmetadata", ()=>{
-                video.play();
-            })
-            
-            videoContainer.append(video);
-            
-        };
         
-        addVideoStream(myCamera, stream); //this adds our video;
+        addVideoStream(myCameraContainer, stream); //this adds our video;
         
         peer.on("call", (call)=>{
             call.answer(stream);
-            const video = document.createElement("video");
+           
+            const cameraContainer = createVideoEl(false);
+
             call.on("stream", (userVideoStream)=>{
-                addVideoStream(video, userVideoStream);
+                addVideoStream(cameraContainer, userVideoStream);
             });
         });
-    socket.on("user-connected", (userID)=>{
-        console.log(`${userID} has connected`)
-        connectToNewUser(userID, stream);
-    });
+
+        socket.on("user-connected", (userID)=>{
+            // cameraContainer.setAttribute("data-user-id", userID )
+            connectToNewUser(userID, stream);
+        });
     
     socket.on("user-disconnected",(userID)=>{
         const removeVideo = document.querySelector(`[data-user-id="${userID}"]`);
@@ -64,17 +80,19 @@ if(videoContainer){
 
 
     peer.on("open", (id)=>{
-        myCamera.setAttribute("data-user-id", id )
+        myCameraContainer.setAttribute("data-user-id", id )
         socket.emit("join-chat", ROOM_ID, id);
     })
 
 
     const connectToNewUser = (userID, stream)=>{
         const call = peer.call(userID, stream);
-        const video = document.createElement("video");
+
+        const cameraContainer = createVideoEl(false);
+        
         call.on("stream", (userVideoStream)=>{
-            addVideoStream(video, userVideoStream)
-            video.setAttribute("data-user-id", userID )
+            addVideoStream(cameraContainer, userVideoStream)
+            cameraContainer.setAttribute("data-user-id", userID )
         });
         
         call.on("close", ()=>{

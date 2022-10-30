@@ -40,8 +40,15 @@ body{
     flex-grow: 0;
 } 
 #chatRoom .videoContainer{
+    display: flex;
     padding: 20px;
 }
-#chatRoom video{ 
-    width: 100px;
+
+.videoContainer .cameraContainer{
+    display: inline-flex;
+    overflow: hidden;
+}
+
+.cameraContainer video{
+    max-width: 100%
 }
