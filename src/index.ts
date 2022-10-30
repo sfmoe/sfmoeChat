@@ -14,6 +14,10 @@ const peerServer = ExpressPeerServer(http, {debug: true});
 
 const io = new SocketIOServer(http);
 
+
+// chat { ...users }
+let chats: any = {};
+
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
 app.use("/peerjs", peerServer);
@@ -38,6 +42,28 @@ app.get('/chat', (req: Request, res: Response) => {
 
         socket.on('disconnect', () => {
             socket.broadcast.emit('user-disconnected', userID)
+        })
+
+        socket.on("message", (message)=>{
+          let chatUsers = chats[chatID];
+          let userName = chatUsers.filter((e: { userID: any; })=>{  
+           return e.userID == userID;
+          }).map((e: { registerName: string; })=>{ return e.registerName})[0];
+          socket.to(chatID).emit("message", message, userID, userName);
+        })
+
+        socket.on("register", (registerName, userID)=>{
+          console.log(registerName, userID);
+
+          if(chatID in chats){
+            chats[chatID].push({
+              userID, registerName
+            })
+          }else{
+            chats[chatID] = [{
+              userID, registerName
+            }]
+          }
         })
     });
   });

@@ -16,6 +16,8 @@ if(form){
 //using https://medium.com/codesphere-cloud/building-a-video-chat-app-with-socket-io-peerjs-codesphere-b0663bcbe3d7
 /* chat room */
 const videoContainer = document.querySelector(".videoContainer");
+const chatContainer = document.querySelector(".chatContainer .chatMessages");
+
 
 const createVideoEl = (muted)=>{
         const video = document.createElement("video");
@@ -40,6 +42,14 @@ const addVideoStream = (video, stream)=>{
 };
 
 
+const createMessage = (message, userID, username)=>{
+    let messageEl = document.createElement("div");
+    messageEl.setAttribute("data-userID", userID);
+    messageEl.innerText = `${username}: ${message}`;
+    return messageEl;
+}
+
+
 if(videoContainer){
 
     const myCameraContainer = createVideoEl(true);
@@ -52,7 +62,7 @@ if(videoContainer){
     .then((stream)=>{
         const socket = io("/");
         let peer = new Peer();
-        
+        let myID;
         
         addVideoStream(myCameraContainer, stream); //this adds our video;
         
@@ -66,10 +76,10 @@ if(videoContainer){
             });
         });
 
-        socket.on("user-connected", (userID)=>{
-            // cameraContainer.setAttribute("data-user-id", userID )
-            connectToNewUser(userID, stream);
-        });
+    socket.on("user-connected", (userID)=>{
+        // cameraContainer.setAttribute("data-user-id", userID )
+        connectToNewUser(userID, stream);
+    });
     
     socket.on("user-disconnected",(userID)=>{
         const removeVideo = document.querySelector(`[data-user-id="${userID}"]`);
@@ -79,8 +89,15 @@ if(videoContainer){
     });
 
 
+    socket.on("message", (message, userID, userName)=>{
+        let newMessage = createMessage(message,userID, userName);
+        chatContainer.appendChild(newMessage);
+    });
+
+
     peer.on("open", (id)=>{
         myCameraContainer.setAttribute("data-user-id", id )
+        myID = id;
         socket.emit("join-chat", ROOM_ID, id);
     })
 
@@ -105,7 +122,31 @@ if(videoContainer){
     };
 
 
+
+    const messageInput = document.querySelector(".chatMessageInput");
+    messageInput.addEventListener("keypress", (e)=>{
+        if(e.charCode == 13){
+            socket.emit("message", messageInput.value);
+            let newMessage = createMessage(messageInput.value,myID, userObject.name);
+            chatContainer.appendChild(newMessage);
+        }
+    })
     window.addEventListener('beforeunload', (event) => { socket.close() });
+
+    let registerDiv = document.querySelector("div.preRegister");
+    let registerForm = registerDiv.querySelector("form");
+
+    registerForm.addEventListener("submit", (e)=>{
+        e.preventDefault();
+        let inputValue = e.target.querySelector("input#userName").value;
+        socket.emit("register", inputValue, myID );
+        registerDiv.parentNode.querySelectorAll(".hidden").forEach(e=>{
+            e.classList.remove("hidden");
+        })
+        registerDiv.remove();
+        userObject.id = myID;
+        userObject.name = inputValue;
+    });
 
 });
 

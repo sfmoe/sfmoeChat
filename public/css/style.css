@@ -24,7 +24,7 @@ body{
 }
 
 #chatRoom .chatContainer{
-    max-width: 20%;
+    width: 30%;
     background: var(--darkgrey);
     color: #fff;
     padding: 10px;
@@ -51,4 +51,12 @@ body{
 
 .cameraContainer video{
     max-width: 100%
+}
+
+.hidden{
+    display: none;
+}
+
+.preRegister{
+    flex-grow: 1;
 }
